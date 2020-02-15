@@ -1,4 +1,4 @@
-# Debezium Unwrap SMT Demo
+# Debezium Unwrap SMT Demo [Windows 10 edition]
 
 This setup is going to demonstrate how to receive events from MySQL database and stream them down to a PostgreSQL database and/or an Elasticsearch server using the [Debezium Event Flattening SMT](http://debezium.io/docs/configuration/event-flattening/).
 
@@ -65,20 +65,26 @@ How to run:
 
 ```shell
 # Start the application
-export DEBEZIUM_VERSION=1.0
+#export DEBEZIUM_VERSION=1.0
+#powershell:
+PS C:\[…]> $env:DEBEZIUM_VERSION = '1.1'
+#check:
+PS C:\[…]> $env:DEBEZIUM_VERSION
+1.1
+
 docker-compose -f docker-compose-jdbc.yaml up
 
 # Start PostgreSQL connector
-curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:8083/connectors/ -d @jdbc-sink.json
+curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:8083/connectors/ -d '@jdbc-sink.json'
 
 # Start MySQL connector
-curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:8083/connectors/ -d @source.json
+curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:8083/connectors/ -d '@source.json'
 ```
 
 Check contents of the MySQL database:
 
 ```shell
-docker-compose -f docker-compose-jdbc.yaml exec mysql bash -c 'mysql -u $MYSQL_USER  -p$MYSQL_PASSWORD inventory -e "select * from customers"'
+docker-compose -f docker-compose-jdbc.yaml exec mysql bash -c 'mysql -u $MYSQL_USER  -p$MYSQL_PASSWORD inventory -e \"select * from customers\"'
 +------+------------+-----------+-----------------------+
 | id   | first_name | last_name | email                 |
 +------+------------+-----------+-----------------------+
@@ -92,7 +98,7 @@ docker-compose -f docker-compose-jdbc.yaml exec mysql bash -c 'mysql -u $MYSQL_U
 Verify that the PostgreSQL database has the same content:
 
 ```shell
-docker-compose -f docker-compose-jdbc.yaml exec postgres bash -c 'psql -U $POSTGRES_USER $POSTGRES_DB -c "select * from customers"'
+docker-compose -f docker-compose-jdbc.yaml exec postgres bash -c 'psql -U $POSTGRES_USER $POSTGRES_DB -c \"select * from customers\"'
  last_name |  id  | first_name |         email         
 -----------+------+------------+-----------------------
  Thomas    | 1001 | Sally      | sally.thomas@acme.com
@@ -114,7 +120,7 @@ Query OK, 1 row affected (0.02 sec)
 Verify that PostgreSQL contains the new record:
 
 ```shell
-docker-compose -f docker-compose-jdbc.yaml exec postgres bash -c 'psql -U $POSTGRES_USER $POSTGRES_DB -c "select * from customers"'
+docker-compose -f docker-compose-jdbc.yaml exec postgres bash -c 'psql -U $POSTGRES_USER $POSTGRES_DB -c \"select * from customers\"'
  last_name |  id  | first_name |         email         
 -----------+------+------------+-----------------------
 ...
